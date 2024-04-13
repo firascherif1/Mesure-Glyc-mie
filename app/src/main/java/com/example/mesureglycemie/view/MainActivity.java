@@ -1,4 +1,4 @@
-package com.example.mesureglycemie;
+package com.example.mesureglycemie.view;
 
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -12,15 +12,20 @@ import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.mesureglycemie.R;
+import com.example.mesureglycemie.controller.Controller;
+
 public class MainActivity extends AppCompatActivity {
     private TextView tvAge, tvReponse;
     private SeekBar sbAge;
     private RadioButton rbIsFasting, rbIsNotFasting;
     private Button btnConsulter;
     private EditText etValeur;
+    private Controller controller;
 
     private void init()
     {
+        controller = Controller.getInstance();
         tvAge = findViewById(R.id.tvAge);
         sbAge = findViewById(R.id.sbAge);
         rbIsFasting = findViewById(R.id.rbtOui);
@@ -28,40 +33,6 @@ public class MainActivity extends AppCompatActivity {
         btnConsulter = findViewById(R.id.btnConsulter);
         etValeur = findViewById(R.id.etValeur);
         tvReponse = findViewById(R.id.tvReponse);
-    }
-    public void calculer () {
-        int age = Integer.valueOf(sbAge.getProgress());
-        float valeurMesuree = Float.valueOf(etValeur.getText().toString());
-        boolean isFasting = rbIsFasting.isChecked();
-        if(isFasting) {
-            if (age >= 13) {
-                if (valeurMesuree < 5.0)
-                    tvReponse.setText("Niveau de glycémie est trop bas");
-                else if (valeurMesuree >= 5.0 && valeurMesuree <= 7.2)
-                    tvReponse.setText("Niveau de glycémie est normale");
-                else
-                    tvReponse.setText("Niveau de glycémie est trop élevé");
-            } else if (age >= 6 && age <= 12) {
-                if (valeurMesuree < 5.0)
-                    tvReponse.setText("Niveau de glycémie est trop bas");
-                else if (valeurMesuree >= 5.0 && valeurMesuree <= 10.0)
-                    tvReponse.setText("Niveau de glycémie est normale");
-                else
-                    tvReponse.setText("Niveau de glycémie est trop élevé");
-            } else if (age < 6) {
-                if (valeurMesuree < 5.5)
-                    tvReponse.setText("Niveau de glycémie est trop bas");
-                else if (valeurMesuree >= 5.5 && valeurMesuree <= 10.0)
-                    tvReponse.setText("Niveau de glycémie est normale");
-                else
-                    tvReponse.setText("Niveau de glycémie est trop élevé");
-            }
-        } else {
-            if (valeurMesuree > 10.5)
-                tvReponse.setText("Niveau de glycémie est trop élevé");
-            else
-                tvReponse.setText("Niveau de glycémie est normale");
-        }
     }
 
     @Override
@@ -86,8 +57,9 @@ public class MainActivity extends AppCompatActivity {
                 });
         btnConsulter.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onClick(View v)
-            {
+            public void onClick(View v){
+                int age;
+                float valeur;
                 Log.i("Information", "button cliqué");
                 boolean verifAge = false, verifValeur = false;
                 if(sbAge.getProgress()!=0)
@@ -100,7 +72,14 @@ public class MainActivity extends AppCompatActivity {
                     Toast.makeText(MainActivity.this, "Veuillez saisir votre valeur mesurée !", Toast.LENGTH_LONG).show();
                 if(verifAge && verifValeur)
                 {
-                    calculer();
+                    age = sbAge.getProgress();
+                    valeur = Float.valueOf(etValeur.getText().toString());
+
+                    //Flèche "UserAction" View --> Controller
+                    controller.createPatient(age, valeur, rbIsFasting.isChecked());
+
+                    //Flèche "Notify" Controller --> view
+                    tvReponse.setText(controller.getReponse());
                 }
             }
         });
