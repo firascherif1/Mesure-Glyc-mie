@@ -1,7 +1,9 @@
 package com.example.mesureglycemie.view;
 
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -16,7 +18,9 @@ import com.example.mesureglycemie.R;
 import com.example.mesureglycemie.controller.Controller;
 
 public class MainActivity extends AppCompatActivity {
-    private TextView tvAge, tvReponse;
+    private final String RESPONSE_KEY = "reponse";
+    private final int REQUEST_CODE = 1; //code de l'activite ConsultActivity
+    private TextView tvAge;//, tvReponse; consultActivity
     private SeekBar sbAge;
     private RadioButton rbIsFasting, rbIsNotFasting;
     private Button btnConsulter;
@@ -32,7 +36,7 @@ public class MainActivity extends AppCompatActivity {
         rbIsNotFasting = findViewById(R.id.rbtNon);
         btnConsulter = findViewById(R.id.btnConsulter);
         etValeur = findViewById(R.id.etValeur);
-        tvReponse = findViewById(R.id.tvReponse);
+        //tvReponse = findViewById(R.id.tvReponse);
     }
 
     @Override
@@ -79,9 +83,26 @@ public class MainActivity extends AppCompatActivity {
                     controller.createPatient(age, valeur, rbIsFasting.isChecked());
 
                     //Flèche "Notify" Controller --> view
-                    tvReponse.setText(controller.getReponse());
+                    //tvReponse.setText(controller.getReponse());
+
+                    Intent intent = new Intent(MainActivity.this, ConsultActivity.class);
+                    intent.putExtra(RESPONSE_KEY, controller.getReponse());
+                    startActivityForResult(intent, REQUEST_CODE);
+
                 }
             }
         });
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == 1) {
+            if (resultCode == RESULT_CANCELED) {
+                // Affichage d'un Toast d'erreur en cas de retour avec RESULT_CANCELED
+                Toast.makeText(this, "Erreur: Consultation annulée", Toast.LENGTH_SHORT).show();
+            }
+        }
     }
 }
