@@ -22,18 +22,19 @@ public class ConsultActivity extends AppCompatActivity {
         init();
         // Récupération de l'intent
         Intent intent = getIntent();
-        if (intent != null) {
-            // Récupération du String transmis dans l'intent
-            reponse = intent.getStringExtra(RESPONSE_KEY);
-            // Mise à jour du TextView avec le résultat de l'analyse
-            tvReposne.setText(reponse);
-        }
+        // Récupération du String transmis dans l'intent
+        reponse = intent.getStringExtra(RESPONSE_KEY);
+        // Mise à jour du TextView avec le résultat de l'analyse
+        tvReposne.setText(reponse);
         btnRetour.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 // Création d'une nouvelle Intent pour retourner à MainActivity
-                Intent retourIntent = new Intent(ConsultActivity.this, MainActivity.class);
-                setResult(RESULT_OK, retourIntent);
+                Intent retourIntent = new Intent();
+                if(reponse == null)
+                    setResult(RESULT_CANCELED, retourIntent);
+                else
+                    setResult(RESULT_OK, retourIntent);
                 // Fermeture de l'activité ConsultActivity
                 finish();
             }

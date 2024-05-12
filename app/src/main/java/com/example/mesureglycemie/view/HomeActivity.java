@@ -8,8 +8,11 @@ import android.view.View;
 import android.widget.Button;
 
 import com.example.mesureglycemie.R;
+import com.example.mesureglycemie.controller.HomeController;
 
 public class HomeActivity extends AppCompatActivity {
+
+    private HomeController homeController;
 
     private Button btnConsultation;
 
@@ -30,5 +33,6 @@ public class HomeActivity extends AppCompatActivity {
 
     private void init() {
         btnConsultation = findViewById(R.id.btnConsultation);
+        homeController = HomeController.getInstance(this);
     }
 }
